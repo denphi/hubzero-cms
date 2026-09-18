@@ -1413,6 +1413,21 @@ HUB.Video = {
 		HUB.Video.transcriptSearch();
 		HUB.Video.transcriptJumpTo();
 		
+		//the markup ships with "None/Off" selected and appending a language above
+		//does not change that, so transcriptSync() matched nothing and never set
+		//.active on a line: the transcript rendered but never followed playback,
+		//until the user picked it by hand from the CC menu.  Mirror
+		//setupSubtitlePicker(), which already marks an auto track selected, and
+		//let the change handlers registered above do the rest.
+		for (var t = 0; t < sub_titles.length; t++)
+		{
+			if (parseInt(sub_titles[t].auto))
+			{
+				$jQ('.transcript-selector').val(sub_titles[t].lang.toLowerCase()).trigger('change');
+				break;
+			}
+		}
+		
 		//flag to know if user is scrolling in box.  Bound here, once: this used
 		//to live in transcriptSync(), which the interval below calls twice a
 		//second, so handlers accumulated for the life of the page.
