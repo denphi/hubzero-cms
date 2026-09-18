@@ -935,8 +935,7 @@
     Subtitles
 ---------------------------------------------------------------*/
 	#video-container.paused #video-subtitles,
-	#video-stage:hover #video-subtitles,
-	#video-player:hover ~ #video-subtitles {
+	#video-stage:hover #video-subtitles {
 		bottom: 60px;
 	}
 	#video-subtitles {
@@ -946,6 +945,11 @@
 		right: 0;
 		text-align: center;
 		z-index: 888;
+		/* Presentational only. It spans the full width above #control-box, and
+		   syncSubtitles() hides/shows/rewrites this subtree several times a
+		   second - without this the caption strip swallows clicks on the
+		   controls, and the click target is destroyed mid-gesture. */
+		pointer-events: none;
 		-webkit-transition: bottom 0.4s;
 	}
 	#video-subtitles div {

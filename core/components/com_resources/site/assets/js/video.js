@@ -27,6 +27,7 @@ HUB.Video = {
 		seeking = false;
 		track = "";
 		syncInterval = null;
+		transcriptInterval = null;
 		transcriptLineActive = 0;
 		transcriptBoxScrolling = false;
 		browser = navigator.userAgent;
@@ -1412,8 +1413,23 @@ HUB.Video = {
 		HUB.Video.transcriptSearch();
 		HUB.Video.transcriptJumpTo();
 		
+		//flag to know if user is scrolling in box.  Bound here, once: this used
+		//to live in transcriptSync(), which the interval below calls twice a
+		//second, so handlers accumulated for the life of the page.
+		$jQ('#transcripts').off('scroll.hubtranscript').on('scroll.hubtranscript', function(event) {
+			transcriptBoxScrolling = true;
+			clearTimeout($jQ.data(this, 'scrollTimer'));
+			$jQ.data(this, 'scrollTimer', setTimeout(function() {
+				transcriptBoxScrolling = false;
+			}, 250));
+		});
+		
 		//sync transcript
-		setInterval(function() {
+		if (transcriptInterval)
+		{
+			clearInterval(transcriptInterval);
+		}
+		transcriptInterval = setInterval(function() {
 			HUB.Video.transcriptSync( sub_titles );
 		}, 500);
 	},
@@ -1610,15 +1626,6 @@ HUB.Video = {
 				var subs = sub_titles[i].subs;
 			}
 		}
-		
-		//flag to know if user is scrolling in box
-		$jQ('#transcripts').on('scroll', function(event) {
-			transcriptBoxScrolling = true;
-			clearTimeout($jQ.data(this, 'scrollTimer'));
-			$jQ.data(this, 'scrollTimer', setTimeout(function() {
-				transcriptBoxScrolling = false;
-			}, 250));
-		});
 		
 		//remove all previously set active lines
 		$jQ('.transcript-line').removeClass('active');
